@@ -1,13 +1,8 @@
-const Transaction = require('../model/Transaction');
-const Booking = require('../model/Booking');
+const paymentService = require('../services/paymentService');
+const asyncHandler = require('../utils/asyncHandler');
+const { success } = require('../utils/response');
 
-
-exports.markPaid = async (req, res) => {
-const { bookingId } = req.body;
-const booking = await Booking.findById(bookingId).populate('parkingId');
-if (!booking) return res.status(404).json({ message: 'Booking not found' });
-if (booking.status !== 'completed') return res.status(400).json({ message: 'Finish booking first' });
-const ownerId = booking.parkingId.ownerId;
-const tx = await Transaction.create({ bookingId: booking._id, ownerId, amount: booking.totalAmount });
-res.json(tx);
-};
+exports.markPaid = asyncHandler(async (req, res) => {
+  const tx = await paymentService.markPaid(req.body.bookingId);
+  success(res, tx);
+});

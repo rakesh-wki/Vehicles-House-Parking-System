@@ -19,3 +19,4 @@ const ParkingSpotSchema = new mongoose.Schema(
 
 module.exports = mongoose.model('ParkingSpot', ParkingSpotSchema);
 
+

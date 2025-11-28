@@ -12,3 +12,4 @@ router.get('/search', parkingCtrl.search);
 module.exports = router;
 
 
+
