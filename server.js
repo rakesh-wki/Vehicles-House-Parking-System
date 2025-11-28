@@ -1,40 +1,9 @@
-const express = require('express');
-const morgan = require('morgan');
-const bodyParser = require('body-parser');
 const connectDB = require('./src/config/db');
-const authRoutes = require('./src/routes/authRoutes');
-const otpRoutes = require('./src/routes/otpRoutes');
-const parkingRoutes = require('./src/routes/parkingRoutes');
-const bookingRoutes = require('./src/routes/bookingRoutes');
-const paymentRoutes = require('./src/routes/paymentRoutes');
+const { PORT } = require('./src/config/env');
+const app = require('./src/app');
 
-require('dotenv').config();
-
-const app = express();
-
-// Connect to MongoDB
+// Connect to DB, then start server
 connectDB();
-
-// Middlewares
-app.use(morgan('dev'));
-app.use(bodyParser.json());
-
-// Routes
-app.use('/auth', authRoutes);
-app.use('/otp', otpRoutes);
-app.use('/parking', parkingRoutes);
-app.use('/booking', bookingRoutes);
-app.use('/payment', paymentRoutes);
-
-// error handler
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || 'Server error';
-  res.status(status).json({ message, error: process.env.NODE_ENV === 'development' ? err : {} });
-});
-
-const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -49,4 +18,4 @@ server.on('error', (err) => {
   process.exit(1);
 });
 
-module.exports = app;
+module.exports = server;
