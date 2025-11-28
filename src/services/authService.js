@@ -1,23 +1,33 @@
 const UserModel = require('../model/User');
-
-const jwt = require('jsonwebtoken');
-
-
-const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
+const { signToken } = require('../utils/jwt');
+const httpError = require('../utils/httpError');
 
 exports.register = async ({ name, email, mobile, password }) => {
-const existing = await UserModel.findOne({ email });
-if (existing) throw { status: 400, message: 'Email exists' };
-const user = await UserModel.create({ name, email, mobile, password });
-const token = signToken(user._id);
-return { user, token };
+  if (!name || !email || !mobile || !password) {
+    throw httpError(400, 'All fields are required');
+  }
+
+  const existing = await UserModel.findOne({ email });
+  if (existing) {
+    throw httpError(400, 'Email already in use');
+  }
+
+  const user = await UserModel.create({ name, email, mobile, password });
+  const token = signToken({ id: user._id });
+  return { user, token };
 };
 
-
 exports.login = async ({ email, password }) => {
-const user = await UserModel.findOne({ email });
-if (!user || !(await user.matchPassword(password))) throw { status: 401, message: 'Invalid creds' };
-const token = signToken(user._id);
-return { user, token };
+  if (!email || !password) {
+    throw httpError(400, 'Email and password are required');
+  }
+
+  const user = await UserModel.findOne({ email });
+  const invalid = !user || !(await user.matchPassword(password));
+  if (invalid) {
+    throw httpError(401, 'Invalid credentials');
+  }
+
+  const token = signToken({ id: user._id });
+  return { user, token };
 };

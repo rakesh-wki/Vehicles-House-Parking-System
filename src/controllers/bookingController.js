@@ -1,33 +1,23 @@
 const bookingService = require('../services/bookingService');
+const asyncHandler = require('../utils/asyncHandler');
+const { success } = require('../utils/response');
 
+exports.startBooking = asyncHandler(async (req, res) => {
+  const booking = await bookingService.start(req.body);
+  success(res, booking, 201);
+});
 
-exports.startBooking = async (req, res, next) => {
-try {
-const booking = await bookingService.start(req.body);
-res.json(booking);
-} catch (err) { next(err); }
-};
+exports.endBooking = asyncHandler(async (req, res) => {
+  const booking = await bookingService.end(req.params.bookingId);
+  success(res, booking);
+});
 
+exports.historyByMobile = asyncHandler(async (req, res) => {
+  const list = await bookingService.historyByMobile(req.query.mobile);
+  success(res, list);
+});
 
-exports.endBooking = async (req, res, next) => {
-try {
-const booking = await bookingService.end(req.params.bookingId);
-res.json(booking);
-} catch (err) { next(err); }
-};
-
-
-exports.historyByMobile = async (req, res, next) => {
-try {
-const list = await bookingService.historyByMobile(req.query.mobile);
-res.json(list);
-} catch (err) { next(err); }
-};
-
-
-exports.ownerHistory = async (req, res, next) => {
-try {
-const list = await bookingService.ownerHistory(req.user._id);
-res.json(list);
-} catch (err) { next(err); }
-};
+exports.ownerHistory = asyncHandler(async (req, res) => {
+  const list = await bookingService.ownerHistory(req.user._id);
+  success(res, list);
+});

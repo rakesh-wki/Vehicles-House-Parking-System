@@ -1,21 +1,21 @@
-const jwt = require('jsonwebtoken');
 const User = require('../model/User');
+const asyncHandler = require('../utils/asyncHandler');
+const httpError = require('../utils/httpError');
+const { verifyToken } = require('../utils/jwt');
 
-exports.protect = async (req, res, next) => {
-  const token =
-    req.headers.authorization && req.headers.authorization.startsWith('Bearer')
-      ? req.headers.authorization.split(' ')[1]
-      : null;
-
+exports.protect = asyncHandler(async (req, res, next) => {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.split(' ')[1] : null;
   if (!token) {
-    return res.status(401).json({ message: 'Not authenticated' });
+    throw httpError(401, 'Not authenticated');
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
-    next();
-  } catch (err) {
-    return res.status(401).json({ message: 'Token invalid' });
+  const decoded = verifyToken(token);
+  const user = await User.findById(decoded.id).select('-password');
+  if (!user) {
+    throw httpError(401, 'User not found');
   }
-};
+
+  req.user = user;
+  next();
+});

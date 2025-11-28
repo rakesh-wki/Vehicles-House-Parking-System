@@ -1,42 +1,28 @@
 const parkingService = require('../services/parkingService');
+const asyncHandler = require('../utils/asyncHandler');
+const { success } = require('../utils/response');
 
+exports.addParking = asyncHandler(async (req, res) => {
+  const spot = await parkingService.create(req.user._id, req.body);
+  success(res, spot, 201);
+});
 
-exports.addParking = async (req, res, next) => {
-try {
-const spot = await parkingService.create(req.user._id, req.body);
-res.json(spot);
-} catch (err) { next(err); }
-};
+exports.updateParking = asyncHandler(async (req, res) => {
+  const updated = await parkingService.update(req.params.id, req.body);
+  success(res, updated);
+});
 
+exports.toggle = asyncHandler(async (req, res) => {
+  const spot = await parkingService.toggle(req.params.id);
+  success(res, spot);
+});
 
-exports.updateParking = async (req, res, next) => {
-try {
-const updated = await parkingService.update(req.params.id, req.body);
-res.json(updated);
-} catch (err) { next(err); }
-};
+exports.mySpots = asyncHandler(async (req, res) => {
+  const spots = await parkingService.mySpots(req.user._id);
+  success(res, spots);
+});
 
-
-exports.toggle = async (req, res, next) => {
-try {
-const spot = await parkingService.toggle(req.params.id);
-res.json(spot);
-} catch (err) { next(err); }
-};
-
-
-exports.mySpots = async (req, res, next) => {
-try {
-const spots = await parkingService.mySpots(req.user._id);
-res.json(spots);
-} catch (err) { next(err); }
-};
-
-
-exports.search = async (req, res, next) => {
-try {
-const result = await parkingService.searchNearby(req.query);
-res.json(result);
-} catch (err) { next(err); }
-};
-
+exports.search = asyncHandler(async (req, res) => {
+  const spots = await parkingService.searchNearby(req.query);
+  success(res, spots);
+});
