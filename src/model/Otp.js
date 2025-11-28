@@ -6,7 +6,7 @@ const OtpSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: parseInt(process.env.OTP_EXPIRE_SECONDS || 300),
+    expires: parseInt(process.env.OTP_EXPIRE_SECONDS || 300, 10),
   },
 });
 

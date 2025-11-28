@@ -1,23 +1,22 @@
-const authService = require('../services/authService');
+const User = require('../model/User');
+const jwt = require('jsonwebtoken');
 
 
-exports.register = async (req, res, next) => {
-try {
-const { user, token } = await authService.register(req.body);
-res.status(201).json({ token, user });
-} catch (err) {
-console.log('Register error:', err);
-next(err);
-}
+const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+  
+
+exports.register = async (req, res) => {
+const { name, email, mobile, password } = req.body;
+const existing = await User.findOne({ email });
+if (existing) return res.status(400).json({ message: 'Email exists' });
+const user = await User.create({ name, email, mobile, password });
+res.json({ token: signToken(user._id), user });
 };
 
 
-exports.login = async (req, res, next) => {
-try {
-const { user, token } = await authService.login(req.body);
-res.json({ token, user });
-} catch (err) {
-console.log('Login error:', err);
-next(err);
-}
+exports.login = async (req, res) => {
+const { email, password } = req.body;
+const user = await User.findOne({ email });
+if (!user || !(await user.matchPassword(password))) return res.status(401).json({ message: 'Invalid creds' });
+res.json({ token: signToken(user._id), user });
 };
