@@ -11,3 +11,4 @@ exports.login = asyncHandler(async (req, res) => {
   const result = await authService.login(req.body);
   success(res, result);
 });
+
