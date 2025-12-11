@@ -17,6 +17,28 @@ exports.register = async ({ name, email, mobile, password }) => {
   return { user, token };
 };
 
+// exports.registerHouseOwner = async ({ name, email, mobile, password }) => {
+//   if (!name || !email || !mobile || !password) {
+//     throw httpError(400, 'All fields are required');
+//   }
+
+//   const existing = await UserModel.findOne({ email });
+//   if (existing) {
+//     throw httpError(400, 'Email already in use');
+//   }
+
+//   const user = await UserModel.create({
+//     name,
+//     email,
+//     mobile,
+//     password,
+//     role: 'houseOwner'    // 👉 Force houseOwner
+//   });
+
+//   const token = signToken({ id: user._id });
+//   return { user, token };
+// };
+
 exports.login = async ({ email, password }) => {
   if (!email || !password) {
     throw httpError(400, 'Email and password are required');
@@ -31,3 +53,5 @@ exports.login = async ({ email, password }) => {
   const token = signToken({ id: user._id });
   return { user, token };
 };
+
+
