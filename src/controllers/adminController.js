@@ -40,6 +40,16 @@ exports.deleteParkingSpot = asyncHandler(async (req, res) => {
   success(res, result);
 });
 
+exports.approveParkingSpot = asyncHandler(async (req, res) => {
+  const spot = await adminService.approveParkingSpot(req.params.id);
+  success(res, spot);
+});
+
+exports.rejectParkingSpot = asyncHandler(async (req, res) => {
+  const spot = await adminService.rejectParkingSpot(req.params.id);
+  success(res, spot);
+});
+
 // Booking Management
 exports.getAllBookings = asyncHandler(async (req, res) => {
   const result = await adminService.getAllBookings(req.query);

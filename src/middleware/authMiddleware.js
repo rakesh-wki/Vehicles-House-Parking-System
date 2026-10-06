@@ -19,3 +19,19 @@ exports.protect = asyncHandler(async (req, res, next) => {
   req.user = user;
 next();
 });
+
+// Attaches req.user when a valid Bearer token is present, but never rejects the request.
+exports.optionalProtect = asyncHandler(async (req, res, next) => {
+  const header = req.headers.authorization || '';
+  const token = header.startsWith('Bearer ') ? header.split(' ')[1] : null;
+  if (token) {
+    try {
+      const decoded = verifyToken(token);
+      const user = await User.findById(decoded.id).select('-password');
+      if (user) req.user = user;
+    } catch (err) {
+      // Invalid/expired token: proceed as anonymous.
+    }
+  }
+  next();
+});

@@ -18,6 +18,8 @@ router.delete('/users/:id', adminCtrl.deleteUser);
 
 // Parking Management
 router.get('/parking', adminCtrl.getAllParkingSpots);
+router.put('/parking/:id/approve', adminCtrl.approveParkingSpot);
+router.put('/parking/:id/reject', adminCtrl.rejectParkingSpot);
 router.delete('/parking/:id', adminCtrl.deleteParkingSpot);
 
 // Booking Management

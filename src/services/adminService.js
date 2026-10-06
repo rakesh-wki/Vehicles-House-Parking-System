@@ -12,6 +12,7 @@ exports.getDashboardStats = async () => {
     totalCustomers,
     totalSpots,
     activeSpots,
+    pendingSpots,
     totalBookings,
     runningBookings,
     totalTransactions,
@@ -22,6 +23,7 @@ exports.getDashboardStats = async () => {
     UserModel.countDocuments({ role: 'customer' }),
     ParkingModel.countDocuments(),
     ParkingModel.countDocuments({ isAvailable: true }),
+    ParkingModel.countDocuments({ status: 'pending' }),
     BookingModel.countDocuments(),
     BookingModel.countDocuments({ status: 'running' }),
     TransactionModel.countDocuments(),
@@ -32,7 +34,8 @@ exports.getDashboardStats = async () => {
 
   return {
     users: { total: totalUsers, owners: totalOwners, customers: totalCustomers },
-    parking: { total: totalSpots, active: activeSpots },
+    parking: { total: totalSpots, active: activeSpots, pending: pendingSpots },
+    pendingSpots,
     bookings: { total: totalBookings, running: runningBookings },
     revenue: { total: totalRevenue, transactions: totalTransactions },
   };
@@ -106,6 +109,23 @@ exports.deleteParkingSpot = async (spotId) => {
     throw httpError(404, 'Parking spot not found');
   }
   return { message: 'Parking spot deleted successfully' };
+};
+
+// Approve / reject a parking spot
+exports.approveParkingSpot = async (spotId) => {
+  const spot = await ParkingModel.findByIdAndUpdate(spotId, { status: 'approved' }, { new: true });
+  if (!spot) {
+    throw httpError(404, 'Parking spot not found');
+  }
+  return spot;
+};
+
+exports.rejectParkingSpot = async (spotId) => {
+  const spot = await ParkingModel.findByIdAndUpdate(spotId, { status: 'rejected' }, { new: true });
+  if (!spot) {
+    throw httpError(404, 'Parking spot not found');
+  }
+  return spot;
 };
 
 // Booking Management

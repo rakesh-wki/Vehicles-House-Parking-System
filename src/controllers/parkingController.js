@@ -26,3 +26,18 @@ exports.search = asyncHandler(async (req, res) => {
   const spots = await parkingService.searchNearby(req.query);
   success(res, spots);
 });
+
+exports.nearby = asyncHandler(async (req, res) => {
+  const spots = await parkingService.findNearby(req.query);
+  success(res, spots);
+});
+
+exports.availability = asyncHandler(async (req, res) => {
+  const data = await parkingService.getFreeSlots(req.params.id);
+  success(res, data);
+});
+
+exports.spotDetail = asyncHandler(async (req, res) => {
+  const spot = await parkingService.getById(req.params.id);
+  success(res, spot);
+});

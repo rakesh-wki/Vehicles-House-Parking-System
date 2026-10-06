@@ -2,7 +2,7 @@ const UserModel = require('../model/User');
 const { signToken } = require('../utils/jwt');
 const httpError = require('../utils/httpError');
 
-exports.register = async ({ name, email, mobile, password }) => {
+exports.register = async ({ name, email, mobile, password, role }) => {
   if (!name || !email || !mobile || !password) {
     throw httpError(400, 'All fields are required');
   }
@@ -12,7 +12,12 @@ exports.register = async ({ name, email, mobile, password }) => {
     throw httpError(400, 'Email already in use');
   }
 
-  const user = await UserModel.create({ name, email, mobile, password });
+  // Self-service signup may only create customer or houseOwner accounts;
+  // admin accounts are created via seed / admin panel.
+  const allowedRoles = ['customer', 'houseOwner'];
+  const safeRole = allowedRoles.includes(role) ? role : 'customer';
+
+  const user = await UserModel.create({ name, email, mobile, password, role: safeRole });
   const token = signToken({ id: user._id });
   return { user, token };
 };
